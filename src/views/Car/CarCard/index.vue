@@ -1,20 +1,29 @@
 <template>
   <div class="card-container">
-    <!-- 搜索区域 -->
+    <!--
+      搜索区域
+      把各种搜索条件当成请求参数发送给后端，后端根据字段对数据库数据做过滤筛选，返回符合条件的数据
+      1.表单组件的双向绑定 收集到当前的请求参数
+      2.将参数通过调用接口传给后端
+    -->
     <div class="search-container">
       <span class="search-label">车牌号码：</span>
-      <el-input clearable placeholder="请输入内容" class="search-main" />
+      <el-input v-model="params.carNumber" clearable placeholder="请输入内容" class="search-main" />
       <span class="search-label">车主姓名：</span>
-      <el-input clearable placeholder="请输入内容" class="search-main" />
+      <el-input v-model="params.personName" clearable placeholder="请输入内容" class="search-main" />
       <span class="search-label">状态：</span>
-      <el-select>
-        <el-option v-for="item in []" :key="item.id" />
+      <!--
+        el-select: 双向绑定收集当前选中的数据
+        el-option: 下拉框中每一项label（"有效"，"无效"） value（选中之后赋值给v-model 将来传给后端）
+      -->
+      <el-select v-model="params.cardStatus">
+        <el-option v-for="item in statusList" :value="item.id" :label="item.name" :key="item.id" />
       </el-select>
-      <el-button type="primary" class="search-btn">查询</el-button>
+      <el-button type="primary" class="search-btn" @click="handleSearch">查询</el-button>
     </div>
     <!-- 新增删除操作区域 -->
     <div class="create-container">
-      <el-button type="primary">添加月卡</el-button>
+      <el-button type="primary" @click="$router.push('/cardAdd')">添加月卡</el-button>
       <el-button>批量删除</el-button>
     </div>
     <!-- 表格区域 -->
@@ -90,15 +99,33 @@
 
 <script>
 import { getCardListAPI } from '@/api/card'
+import router from '@/router'
 export default {
   data() {
     return {
       list: [], // 月卡列表
       params: {
         page: 1,
-        pageSize: 5
+        pageSize: 5,
+        carNumber: '',
+        personName: '',
+        cardStatus: null
       },
-      total: 0
+      total: 0,
+      statusList: [
+        {
+          id: null,
+          name: '全部'
+        },
+        {
+          id: 0,
+          name: '有效'
+        },
+        {
+          id: 1,
+          name: '已过期'
+        }
+      ]
     }
   },
   mounted() {
@@ -127,6 +154,10 @@ export default {
     async currentChange(page) {
       // console.log(page)
       this.params.page = page
+      this.getList()
+    },
+    handleSearch() {
+      this.params.page = 1
       this.getList()
     }
   }

@@ -74,6 +74,10 @@ export const routes = [
     }]
   },
   {
+    path: '/cardAdd',
+    component: () => import('@/views/Car/CarCard/add-card')
+  },
+  {
     path: '/pole',
     component: Layout,
     permission: 'pole',
