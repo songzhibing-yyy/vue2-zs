@@ -72,11 +72,19 @@ export default {
   },
   methods: {
     loginHandler() {
-      this.$refs.form.validate(valid => {
+      this.$refs.form.validate(async valid => {
         // console.log(valid)
         // 所有的表单项都通过校验 valid才为true
         if (valid) {
-          // ToDo Login
+          // Login
+          await this.$store.dispatch('user/asyncLogin', this.form)
+          // 跳转到首页
+          this.$router.push('/')
+          // 提示用户登录成功
+          this.$message({
+            type: 'success',
+            message: '登录成功'
+          })
         }
       })
     }

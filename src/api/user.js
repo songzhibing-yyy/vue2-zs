@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 登录函数
 /**
  * @description: 登录函数
- * @param {*} data { mobile,password}
+ * @param {*} data { username,password}
  * @return {*} promise
  */
 // 函数： 参数+逻辑+返回值

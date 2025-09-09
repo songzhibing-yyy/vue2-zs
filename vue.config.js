@@ -15,6 +15,7 @@ module.exports = {
   productionSourceMap: false,
   // 配置代理转发
   devServer: {
+    host: '0.0.0.0',
     port: port,
     open: true,
     overlay: {
