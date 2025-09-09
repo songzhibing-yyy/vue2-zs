@@ -182,7 +182,6 @@ export default {
   methods: {
     async getDetail() {
       if (!this.id) return // 新增模式下不需要获取详情
-      
       const res = await getCardDetailAPI(this.id)
       // 回填车辆信息表单
       const { carInfoId, personName, phoneNumber, carNumber, carBrand } = res.data
@@ -223,13 +222,11 @@ export default {
                 cardEndDate: this.feeForm.payTime[1]
               }
               delete reqData.payTime
-              
               // 新增模式下，移除可能为 undefined 的 ID 字段
               if (!this.id) {
                 delete reqData.carInfoId
                 delete reqData.rechargeId
               }
-              
               console.log(reqData)
               // 调用接口需要区分是编辑还是新增
               if (this.id) {

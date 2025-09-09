@@ -50,7 +50,7 @@
             <el-button size="mini" type="text">续费</el-button>
             <el-button size="mini" type="text">查看</el-button>
             <el-button size="mini" type="text" @click="editCard(scope.row.id)">编辑</el-button>
-            <el-button size="mini" type="text">删除</el-button>
+            <el-button size="mini" type="text" @click="delCard(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { getCardListAPI } from '@/api/card'
+import { getCardListAPI,delCardAPI } from '@/api/card'
 // import router from '@/router'
 export default {
   data() {
@@ -173,6 +173,26 @@ export default {
         query: {
           id
         }
+      })
+    },
+    delCard(id) {
+      this.$confirm('此操作将永久删除该文件，是否继续', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async() => {
+        await delCardAPI(id)
+        // 更新列表
+        this.getList()
+        this.$message({
+          type: 'success',
+          message: '成功删除'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
       })
     }
   }
