@@ -30,21 +30,30 @@
       </div>
       <div class="form-container">
         <div class="title">最新一次月卡缴费信息</div>
+        <!--
+            缴费信息
+        -->
         <div class="form">
-          <el-form label-width="100px">
-            <el-form-item label="有效日期">
-              <el-input />
+          <el-form label-width="100px" :model="feeForm" :rules="feeFormRules">
+            <el-form-item label="有效日期" prop="payTime">
+              <el-date-picker
+                v-model="feeForm.payTime"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+              />
             </el-form-item>
-            <el-form-item label="支付金额">
-              <el-input />
+            <el-form-item label="支付金额" prop="paymentAmount">
+              <el-input v-model="feeForm.paymentAmount" />
             </el-form-item>
-            <el-form-item label="支付方式">
-              <el-select>
+            <el-form-item label="支付方式" prop="paymentMethod">
+              <el-select v-model="feeForm.paymentMethod">
                 <el-option
-                  v-for="item in [{}]"
-                  :key="item.industryCode"
-                  :value="item.industryCode"
-                  :label="item.industryName"
+                  v-for="item in payMethodList"
+                  :key="item.id"
+                  :value="item.id"
+                  :label="item.name"
                 />
               </el-select>
             </el-form-item>
@@ -109,7 +118,51 @@ export default {
           message: '请输入车辆品牌',
           trigger: 'blur'
         }]
-      }
+      },
+      // 缴费信息表单
+      feeForm: {
+        payTime: '', // 支付时间
+        paymentAmount: null, // 支付金额
+        paymentMethod: '' // 支付方式
+      },
+      // 缴费规则
+      feeFormRules: {
+        payTime: [
+          {
+            required: true,
+            message: '请选择支付时间'
+          }
+        ],
+        paymentAmount: [
+          {
+            required: true,
+            message: '请输入支付金额',
+            trigger: 'blur'
+          }
+        ],
+        paymentMethod: [
+          {
+            required: true,
+            message: '请选择支付方式',
+            trigger: 'change'
+          }
+        ]
+      },
+      // 支付方式列表
+      payMethodList: [
+        {
+          id: 'Alipay',
+          name: '支付宝'
+        },
+        {
+          id: 'WeChat',
+          name: '微信'
+        },
+        {
+          id: 'Cash',
+          name: '线下'
+        }
+      ]
     }
   }
 
