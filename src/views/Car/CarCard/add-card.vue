@@ -1,8 +1,8 @@
 <template>
   <div class="add-card">
-    <header class="add-header">
-      <el-page-header content="增加月卡" @back="$router.back()" />
-    </header>
+    <!-- <header class="add-header">
+      <el-page-header :content="isEditMode ? '编辑月卡' : '增加月卡'" @back="$router.back()" />
+    </header> -->
     <main class="add-main">
       <div class="form-container">
         <div class="title">车辆信息</div>
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { createCardAPI } from '@/api/card'
+import { createCardAPI, getCardDetailAPI, updateCardAPI } from '@/api/card'
 export default {
   data() {
     const validatorCarNumber = (rule, value, callback) => {
@@ -168,49 +168,90 @@ export default {
       ]
     }
   },
+  computed: {
+    // 缓存id
+    id() {
+      return this.$route.query.id
+    }
+  },
+  mounted() {
+    if (this.id) {
+      this.getDetail()
+    }
+  },
   methods: {
-    async confirmAdd() {
-      // 两个表单的统一校验
+    async getDetail() {
+      if (!this.id) return // 新增模式下不需要获取详情
+      
+      const res = await getCardDetailAPI(this.id)
+      // 回填车辆信息表单
+      const { carInfoId, personName, phoneNumber, carNumber, carBrand } = res.data
+      this.carInfoForm = {
+        carInfoId, personName, phoneNumber, carNumber, carBrand
+      }
+
+      // 回填缴费信息表单
+      const { rechargeId, cardStartDate, cardEndDate, paymentAmount, paymentMethod } = res.data
+      this.feeForm = {
+        rechargeId,
+        paymentAmount,
+        paymentMethod,
+        payTime: [cardStartDate, cardEndDate]
+      }
+    },
+    confirmAdd() {
+      // 俩个表单统一校验
       // 调用实例的validate方法
-      // 1、串行校验 第一个表单校验结束后 再开启第二个表单校验
-      // 2、并行校验 两个表单项同时校验
+      // 1. 串行校验 第一个表单校验通过之后再开始第二个表单
+      // 2. 并行校验 俩个表单项同时进行校验
+      // const p1 = this.$refs.feeForm.validate()
+      // const p2 = this.$refs.carInfoForm.validate()
+      // Promise.all([p1, p2]).then(res => {
+      //   console.log(res)
+      // })
       this.$refs.carInfoForm.validate(valid => {
         if (valid) {
-        //   console.log('第一层')
+          // 第二个表单校验
           this.$refs.feeForm.validate(async valid => {
             if (valid) {
               // TODO API
               // 二次处理请求参数
-              const resData = {
+              const reqData = {
                 ...this.carInfoForm,
                 ...this.feeForm,
                 cardStartDate: this.feeForm.payTime[0],
                 cardEndDate: this.feeForm.payTime[1]
               }
-              delete resData.payTime
-              console.log(resData)
-              const res = await createCardAPI(resData)
-              console.log(res)
-              if (res.code === 10000) {
-                this.$router.back()
-                this.$message.success('新增成功')
-              } else {
-                this.$message.error('新增失败，请稍后重试')
+              delete reqData.payTime
+              
+              // 新增模式下，移除可能为 undefined 的 ID 字段
+              if (!this.id) {
+                delete reqData.carInfoId
+                delete reqData.rechargeId
               }
-            //   console.log('校验通过')
+              
+              console.log(reqData)
+              // 调用接口需要区分是编辑还是新增
+              if (this.id) {
+                // 编辑
+                await updateCardAPI(reqData)
+              } else {
+                await createCardAPI(reqData)
+              }
+
+              // 后续处理
+              // 提示用户
+              this.$message.success(`${this.id ? '更新成功' : '新增成功'}`)
+              // 跳回列表
+              this.$router.back()
             }
           })
         }
       })
-    //   const p1 = this.$refs.carInfoForm.validate(valid=>{ if (valid )})
-    //   const p2 = this.$refs.carInfoForm.validate(valid=>{ if (valid )})
-    //   Promise.all([p1,p2]).then(res =>{
-    //     console.log(res)
-    //   })
     }
   }
-
 }
+
 </script>
 
 <style scoped lang="scss">

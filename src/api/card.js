@@ -24,3 +24,27 @@ export function createCardAPI(data) {
     data
   })
 }
+/**
+ * 获取月卡详情
+ * @data
+ * @returns
+ */
+export function getCardDetailAPI(id) {
+  return request({
+    url: `/parking/card/detail/${id}`
+  })
+}
+
+/**
+ * 更新月卡
+ * @data
+ * @returns
+ */
+export function updateCardAPI(data) {
+  return request({
+    url: '/parking/card/edit',
+    method: 'PUT',
+    data
+  })
+}
+

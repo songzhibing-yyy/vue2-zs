@@ -42,10 +42,14 @@
         <el-table-column label="剩余有效天数" prop="totalEffectiveDate" />
         <el-table-column label="状态" prop="cardStatus" :formatter="formatter" />
         <el-table-column label="操作" fixed="right" width="180">
+          <!--
+            scope作用域插槽
+            scope.row -> 当前行的对象数据
+          -->
           <template #default="scope">
             <el-button size="mini" type="text">续费</el-button>
             <el-button size="mini" type="text">查看</el-button>
-            <el-button size="mini" type="text">编辑</el-button>
+            <el-button size="mini" type="text" @click="editCard(scope.row.id)">编辑</el-button>
             <el-button size="mini" type="text">删除</el-button>
           </template>
         </el-table-column>
@@ -99,7 +103,7 @@
 
 <script>
 import { getCardListAPI } from '@/api/card'
-import router from '@/router'
+// import router from '@/router'
 export default {
   data() {
     return {
@@ -159,6 +163,17 @@ export default {
     handleSearch() {
       this.params.page = 1
       this.getList()
+    },
+    editCard(id) {
+      console.log(id)
+      // query - url?id=1001
+      // params - url/1001
+      this.$router.push({
+        path: '/cardAdd',
+        query: {
+          id
+        }
+      })
     }
   }
 
