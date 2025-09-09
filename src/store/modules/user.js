@@ -1,5 +1,5 @@
 import { loginAPI } from '@/api/user'
-import { setToken, getToken } from '@/utils/auth'
+import { setToken, getToken, removeToken } from '@/utils/auth'
 export default {
   namespaced: true,
   // 数据状态 响应式 data
@@ -14,6 +14,11 @@ export default {
       state.token = newToken
       // Cookie也存一份
       setToken(newToken)
+    },
+    clearUserInfo(state) {
+      // 清除token
+      state.token = ''
+      removeToken()
     }
   },
   // 异步 接口请求+提交mutation
