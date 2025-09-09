@@ -42,11 +42,20 @@
         </el-table-column>
       </el-table>
     </div>
-    <!--分页器-->
+    <!--
+      分页器
+      1.页数分出来  页数等于 = total / 每页总条数
+      2.点击每页的时候，获取当前页的数据重新渲染到table上
+        1. 通过事件获取当前点击的是第几页
+        2. 以当前拿到的页数作为参数和后端要数据
+        3. 把获取到的当前页的列表数据重新渲染到table组件上
+    -->
     <div class="page-container">
       <el-pagination
         layout="total, prev, pager, next"
-        :total="0"
+        :pageSize="params.pageSize"
+        :total="total"
+        @current-change="currentChange"
       />
     </div>
     <!-- 添加弹框 -->
@@ -87,8 +96,9 @@ export default {
       list: [], // 月卡列表
       params: {
         page: 1,
-        pageSize: 10
-      }
+        pageSize: 5
+      },
+      total: 0
     }
   },
   mounted() {
@@ -100,6 +110,7 @@ export default {
       const res = await getCardListAPI(this.params)
       // 2.把后端数据赋值给给响应式list
       this.list = res.data.rows
+      this.total = res.data.total
     },
     formatter(row) {
       // return的数据就是要渲染到当前列的数据
@@ -112,6 +123,11 @@ export default {
       // 对象取值 点语法 []语法
       // return row.cardStatus === 0 ? '有效' : '已过期'
       return map[row.cardStatus]
+    },
+    async currentChange(page) {
+      // console.log(page)
+      this.params.page = page
+      this.getList()
     }
   }
 
