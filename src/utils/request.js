@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { getToken } from './auth'
+import { Message } from 'element-ui'
 
 // 1、通用配置
 // 2、定制化的配置
@@ -47,7 +48,14 @@ service.interceptors.response.use(
   response => {
     return response.data
   },
+  // 接口出错的时候自动执行这个回调
   error => {
+    console.dir(error.response.data.msg)
+    // 错误类型可能有好多种 根据不同的状态码进行不同的错误提示
+    Message.warning({
+      type: 'warning',
+      message: error.response.data.msg
+    })
     return Promise.reject(error)
   }
 )
