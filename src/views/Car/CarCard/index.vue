@@ -102,7 +102,16 @@ export default {
       this.list = res.data.rows
     },
     formatter(row) {
-      return row.cardStatus === 0 ? '可用' : '已过期'
+      // return的数据就是要渲染到当前列的数据
+      // 如果当前的状态除了0/1/2/3/4/5/6 -if
+      // 解决方案：通过映射的方式做匹配
+      const map = {
+        0: '有效',
+        1: '已过期'
+      }
+      // 对象取值 点语法 []语法
+      // return row.cardStatus === 0 ? '有效' : '已过期'
+      return map[row.cardStatus]
     }
   }
 
