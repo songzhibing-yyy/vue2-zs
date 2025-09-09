@@ -29,7 +29,13 @@
         </el-form-item>
 
         <el-form-item prop="remember">
-          <el-checkbox>记住我</el-checkbox>
+          <!--
+            1. 完成选择框的双向绑定，得到true或者false的选中状态
+            2. 如果当前为true，点击登录时，记住；把当前的用户名密码存入本地
+            3. 组件初始化时，从本地取账号与密码 账号密码存入用来双向绑定的form对象
+            4. 如果当前用户没有选中，需要将之前的本地记录删除
+          -->
+          <el-checkbox v-model="remember">记住我</el-checkbox>
         </el-form-item>
 
         <el-form-item>
@@ -41,7 +47,7 @@
 </template>
 
 <script>
-
+const REMEMBER_KEY = 'remember-key'
 export default {
   name: 'Login',
   data() {
@@ -67,12 +73,29 @@ export default {
             trigger: 'blur'
           }
         ]
-      }
+      },
+      // 记住我状态
+      remember: false
+    }
+  },
+  created() {
+    //  去本地取一下之前存的账号密码 如果取到了就赋值操作
+    const formstr = localStorage.getItem(REMEMBER_KEY)
+    if (formstr) {
+      const { username, password } = JSON.parse(formstr)
+      this.form.username = username
+      this.form.password = password
     }
   },
   methods: {
     loginHandler() {
       this.$refs.form.validate(async valid => {
+        // 添加记住我逻辑
+        if (this.remember) {
+          localStorage.setItem(REMEMBER_KEY, JSON.stringify(this.form))
+        } else {
+          localStorage.removeItem(REMEMBER_KEY)
+        }
         // console.log(valid)
         // 所有的表单项都通过校验 valid才为true
         if (valid) {

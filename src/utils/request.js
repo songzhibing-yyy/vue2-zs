@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import { getToken } from './auth'
 
 // 1、通用配置
 // 2、定制化的配置
@@ -31,6 +31,10 @@ const service = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
   config => {
+    const token = getToken() // 获取token
+    if (token) {
+      config.headers.Authorization = token // 请求头中添加token
+    }
     return config
   },
   error => {
