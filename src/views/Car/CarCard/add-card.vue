@@ -12,7 +12,7 @@
             el-form-item prop指定用哪条规则
             el-input：v-model双向绑定
           -->
-          <el-form label-width="100px" :model="carInfoForm" :rules="carInfoRules">
+          <el-form ref="carInfoForm" label-width="100px" :model="carInfoForm" :rules="carInfoRules">
             <el-form-item label="车主姓名" prop="personName">
               <el-input v-model="carInfoForm.personName" />
             </el-form-item>
@@ -34,7 +34,7 @@
             缴费信息
         -->
         <div class="form">
-          <el-form label-width="100px" :model="feeForm" :rules="feeFormRules">
+          <el-form ref="feeForm" label-width="100px" :model="feeForm" :rules="feeFormRules">
             <el-form-item label="有效日期" prop="payTime">
               <el-date-picker
                 v-model="feeForm.payTime"
@@ -42,6 +42,8 @@
                 range-separator="至"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
+                format="yyyy年MM月dd日"
+                value-format="yyyy-MM-dd"
               />
             </el-form-item>
             <el-form-item label="支付金额" prop="paymentAmount">
@@ -65,13 +67,14 @@
     <footer class="add-footer">
       <div class="btn-container">
         <el-button>重置</el-button>
-        <el-button type="primary">确定</el-button>
+        <el-button type="primary" @click="confirmAdd">确定</el-button>
       </div>
     </footer>
   </div>
 </template>
 
 <script>
+import { createCardAPI } from '@/api/card'
 export default {
   data() {
     const validatorCarNumber = (rule, value, callback) => {
@@ -163,6 +166,47 @@ export default {
           name: '线下'
         }
       ]
+    }
+  },
+  methods: {
+    async confirmAdd() {
+      // 两个表单的统一校验
+      // 调用实例的validate方法
+      // 1、串行校验 第一个表单校验结束后 再开启第二个表单校验
+      // 2、并行校验 两个表单项同时校验
+      this.$refs.carInfoForm.validate(valid => {
+        if (valid) {
+        //   console.log('第一层')
+          this.$refs.feeForm.validate(async valid => {
+            if (valid) {
+              // TODO API
+              // 二次处理请求参数
+              const resData = {
+                ...this.carInfoForm,
+                ...this.feeForm,
+                cardStartDate: this.feeForm.payTime[0],
+                cardEndDate: this.feeForm.payTime[1]
+              }
+              delete resData.payTime
+              console.log(resData)
+              const res = await createCardAPI(resData)
+              console.log(res)
+              if (res.code === 10000) {
+                this.$router.back()
+                this.$message.success('新增成功')
+              } else {
+                this.$message.error('新增失败，请稍后重试')
+              }
+            //   console.log('校验通过')
+            }
+          })
+        }
+      })
+    //   const p1 = this.$refs.carInfoForm.validate(valid=>{ if (valid )})
+    //   const p2 = this.$refs.carInfoForm.validate(valid=>{ if (valid )})
+    //   Promise.all([p1,p2]).then(res =>{
+    //     console.log(res)
+    //   })
     }
   }
 
