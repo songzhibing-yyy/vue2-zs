@@ -6,7 +6,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   // 组合模块的配置项
   modules: {
-    user:user
+    user: user
   }
 })
 // 组件中使用user模板中的数据

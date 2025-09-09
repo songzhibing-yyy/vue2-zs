@@ -3,19 +3,29 @@
     <div class="bg" />
     <div class="box">
       <div class="title">智慧园区-登录</div>
-      <el-form ref="form">
+      <!--
+        基础校验
+        el-form :model="表单对象" :rules="规则对象"
+        el-form-item prop属性指定一下使用哪条规则
+        el-input v-model双向绑定
+
+        统一校验
+        1、获取表单实例对象
+        2、调用validate方法
+      -->
+      <el-form ref="form" :model="form" :rules="rules">
         <el-form-item
           label="账号"
           prop="username"
         >
-          <el-input />
+          <el-input v-model="form.username" />
         </el-form-item>
 
         <el-form-item
           label="密码"
           prop="password"
         >
-          <el-input />
+          <el-input v-model="form.password" />
         </el-form-item>
 
         <el-form-item prop="remember">
@@ -23,7 +33,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" class="login_btn">登录</el-button>
+          <el-button type="primary" class="login_btn" @click="loginHandler">登录</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -33,8 +43,44 @@
 <script>
 
 export default {
-  name: 'Login'
-
+  name: 'Login',
+  data() {
+    return {
+      // 表单对象
+      form: {
+        username: '',
+        password: ''
+      },
+      // 规则对象
+      rules: {
+        username: [
+          {
+            required: true,
+            message: '请输入账号',
+            trigger: 'blur'
+          }
+        ],
+        password: [
+          {
+            required: true,
+            message: '请输入密码',
+            trigger: 'blur'
+          }
+        ]
+      }
+    }
+  },
+  methods: {
+    loginHandler() {
+      this.$refs.form.validate(valid => {
+        // console.log(valid)
+        // 所有的表单项都通过校验 valid才为true
+        if (valid) {
+          // ToDo Login
+        }
+      })
+    }
+  }
 }
 
 </script>
