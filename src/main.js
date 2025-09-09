@@ -20,6 +20,9 @@ import '@/icons'
 // 全局注册组件
 Vue.use(ElementUI)
 
+// 添加权限控制初始化(直接把permission.js代码立即执行)
+import './permission'
+
 Vue.config.productionTip = false
 
 // vue实例化
